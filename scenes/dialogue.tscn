@@ -1,0 +1,88 @@
+[gd_scene load_steps=12 format=2]
+
+[ext_resource path="res://scripts/script.gd" type="Script" id=1]
+[ext_resource path="res://sprites/namebox.png" type="Texture" id=2]
+[ext_resource path="res://scripts/caption.gd" type="Script" id=3]
+[ext_resource path="res://fonts/m5x7.ttf" type="DynamicFontData" id=4]
+[ext_resource path="res://scripts/caption_text.gd" type="Script" id=5]
+[ext_resource path="res://sprites/textbox.png" type="Texture" id=6]
+[ext_resource path="res://scripts/dialogue.gd" type="Script" id=7]
+[ext_resource path="res://scripts/menu.gd" type="Script" id=8]
+
+[sub_resource type="DynamicFont" id=1]
+size = 32
+font_data = ExtResource( 4 )
+
+[sub_resource type="DynamicFont" id=2]
+size = 32
+font_data = ExtResource( 4 )
+
+[sub_resource type="GDScript" id=3]
+script/source = "extends RichTextLabel
+
+signal dialogue_line_finished
+var finished = false
+
+func _ready():
+	visible = false
+
+func advance():
+	_finish()
+
+func _on_Timer_timeout():
+	set_visible_characters(get_visible_characters()+1)
+	if get_visible_characters() > get_total_character_count():
+		_finish()
+		
+func _finish():
+	if not finished:
+		set_visible_characters(get_total_character_count())
+		emit_signal('dialogue_line_finished')
+		finished = true
+
+func show_dialogue(text):
+	set_bbcode(text)
+	set_visible_characters(0)
+	finished = false"
+
+[node name="Node2D" type="Node2D"]
+script = ExtResource( 1 )
+
+[node name="caption" type="Sprite" parent="."]
+position = Vector2( 240, 508 )
+texture = ExtResource( 2 )
+script = ExtResource( 3 )
+
+[node name="caption_text" type="RichTextLabel" parent="caption"]
+margin_left = -60.0
+margin_top = -16.0
+margin_right = 68.0
+margin_bottom = 14.0
+custom_fonts/normal_font = SubResource( 1 )
+custom_colors/default_color = Color( 0, 0, 0, 1 )
+text = "test"
+script = ExtResource( 5 )
+
+[node name="dialogue" type="Sprite" parent="."]
+position = Vector2( 540, 600 )
+texture = ExtResource( 6 )
+script = ExtResource( 7 )
+
+[node name="dialogue_text" type="RichTextLabel" parent="dialogue"]
+margin_left = -351.0
+margin_top = -40.0
+margin_right = 349.0
+margin_bottom = 45.0
+custom_fonts/normal_font = SubResource( 2 )
+custom_colors/default_color = Color( 0, 0, 0, 1 )
+text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris a sem est. Morbi pellentesque mattis lorem non ultrices. Proin sed enim quis dolor scelerisque laoreet et sit amet ex."
+script = SubResource( 3 )
+
+[node name="Timer" type="Timer" parent="dialogue"]
+wait_time = 0.05
+autostart = true
+
+[node name="menu" type="Node2D" parent="."]
+script = ExtResource( 8 )
+[connection signal="dialogue_line_finished" from="dialogue/dialogue_text" to="." method="_on_dialogue_text_dialogue_line_finished"]
+[connection signal="timeout" from="dialogue/Timer" to="dialogue/dialogue_text" method="_on_Timer_timeout"]
