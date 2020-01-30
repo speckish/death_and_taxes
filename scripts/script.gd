@@ -17,6 +17,7 @@ func _ready():
 	dialogue.hide()
 	caption.hide()
 	menu.hide()
+	
 	_jump('start');
 
 func _input(event):
@@ -36,6 +37,10 @@ func _advance_script():
 	elif typeof(line) == TYPE_DICTIONARY and line.has('action'):
 		if line['action'] == 'jump':
 			_jump(line['label'])
+		elif line['action'] == 'call':
+			_call(line['label'])
+		elif line['action'] == 'return':
+			_return()
 
 func _show_dialogue(line):
 	if state == 'menu':
@@ -57,7 +62,19 @@ func _show_menu(line):
 func _jump(label):
 	script_state = [{'label': label,
 					 'state': 0}]
-	_advance_script()	
+	_advance_script()
+	
+func _call(label):
+	script_state.push_back({'label': label,
+					 		'state': 0})
+	_advance_script()
+	
+func _return():
+	var frame = script_state.pop_back()
+	while !frame.has('label'):
+		frame = script_state.pop_back()
+	script_state[-1]['state'] += 1
+	_advance_script()
 
 func _get_block():
 	pass
@@ -86,10 +103,9 @@ func _get_line():
 		script_state[-1]['state'] += 1
 		return line
 	elif typeof(line) == TYPE_DICTIONARY and line.has('action'):
-		if line['action'] == 'jump':
+		if line['action'] == 'jump' or line['action'] == 'call' or line['action'] == 'return':
 			return line
 	elif typeof(line) == TYPE_ARRAY and line.size() == 0:
-		print("WHAT")
 		script_state.pop_back()
 		script_state[-1]['state'] += 1
 		return _get_line()
