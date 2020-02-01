@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://scripts/choice_node.gd" type="Script" id=1]
 [ext_resource path="res://sprites/choice_box_hovered.png" type="Texture" id=2]
@@ -7,6 +7,14 @@
 [ext_resource path="res://scenes/choice.gd" type="Script" id=5]
 
 [sub_resource type="StyleBoxTexture" id=2]
+texture = ExtResource( 2 )
+region_rect = Rect2( 0, 0, 400, 72 )
+
+[sub_resource type="StyleBoxTexture" id=5]
+texture = ExtResource( 3 )
+region_rect = Rect2( 0, 0, 400, 72 )
+
+[sub_resource type="StyleBoxTexture" id=6]
 texture = ExtResource( 2 )
 region_rect = Rect2( 0, 0, 400, 72 )
 
@@ -27,6 +35,8 @@ margin_top = -37.0
 margin_right = 200.0
 margin_bottom = 35.0
 custom_styles/hover = SubResource( 2 )
+custom_styles/pressed = SubResource( 5 )
+custom_styles/focus = SubResource( 6 )
 custom_styles/normal = SubResource( 3 )
 custom_fonts/font = SubResource( 4 )
 custom_colors/font_color = Color( 0, 0, 0, 1 )

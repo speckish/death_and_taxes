@@ -10,6 +10,8 @@ onready var dialogue = get_node("dialogue")
 onready var caption = get_node("caption")
 onready var menu = get_node("menu")
 
+signal change_dialogue_state
+
 func _ready():
 	script_file.open("res://assets/script.json", script_file.READ)
 	script = parse_json(script_file.get_as_text())
@@ -60,6 +62,9 @@ func _show_menu(line):
 	menu.show_menu(line)
 
 func _jump(label):
+	if ("_chat" in label):
+		print("Idle")
+		emit_signal("change_dialogue_state", "idle")
 	script_state = [{'label': label,
 					 'state': 0}]
 	_advance_script()
@@ -98,7 +103,6 @@ func _get_line():
 					return _get_line()
 				else:
 					line = line[script_state[k]['state']]
-	print(line)
 	if typeof(line) == TYPE_DICTIONARY and line.has('caption'):
 		script_state[-1]['state'] += 1
 		return line
@@ -120,5 +124,7 @@ func _on_dialogue_text_dialogue_line_finished():
 	finished = true
 	
 func _on_choice_selected(choice):
+	print("Chatting.")
+	emit_signal("change_dialogue_state", "chatting")
 	script_state[-1]['choice'] = choice
 	_advance_script()
