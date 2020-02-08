@@ -10,7 +10,10 @@ onready var dialogue = get_node("dialogue")
 onready var caption = get_node("caption")
 onready var menu = get_node("menu")
 
-signal change_dialogue_state
+signal chatting
+signal idle
+signal results
+signal end
 
 func _ready():
 	script_file.open("res://assets/script.json", script_file.READ)
@@ -20,7 +23,7 @@ func _ready():
 	caption.hide()
 	menu.hide()
 	
-	_jump('start');
+	_jump('witch_start');
 
 func _input(event):
 	if event is InputEventMouse && event.is_pressed() and state != 'menu':
@@ -58,21 +61,31 @@ func _show_menu(line):
 	if state == 'dialogue':
 		caption.hide()
 		dialogue.hide()
+	elif state == 'menu':
+		menu.hide()
 	state = 'menu'
 	menu.show_menu(line)
 
 func _jump(label):
+	if label == "results":
+		emit_signal(results)
+		return
+	if label == "end":
+		emit_signal('end')
+		return
 	if ("_chat" in label):
-		print("Idle")
-		emit_signal("change_dialogue_state", "idle")
+		emit_signal("idle")
 	script_state = [{'label': label,
 					 'state': 0}]
 	_advance_script()
 	
 func _call(label):
 	script_state.push_back({'label': label,
-					 		'state': 0})
+							'state': 0})
 	_advance_script()
+	
+func _show():
+	pass
 	
 func _return():
 	var frame = script_state.pop_back()
@@ -124,7 +137,6 @@ func _on_dialogue_text_dialogue_line_finished():
 	finished = true
 	
 func _on_choice_selected(choice):
-	print("Chatting.")
-	emit_signal("change_dialogue_state", "chatting")
+	emit_signal("chatting")
 	script_state[-1]['choice'] = choice
 	_advance_script()
