@@ -14,6 +14,8 @@ signal chatting
 signal idle
 signal results
 signal end
+signal show_bartle
+signal hide_bartle
 
 func _ready():
 	script_file.open("res://assets/script.json", script_file.READ)
@@ -23,7 +25,7 @@ func _ready():
 	caption.hide()
 	menu.hide()
 	
-	_jump('witch_start');
+	_jump('start');
 
 func _input(event):
 	if event is InputEventMouse && event.is_pressed() and state != 'menu':
@@ -67,8 +69,12 @@ func _show_menu(line):
 	menu.show_menu(line)
 
 func _jump(label):
+	if label == "demo_start":
+		emit_signal('show_bartle')
+	if label == "demo_end":
+		emit_signal('hide_bartle')
 	if label == "results":
-		emit_signal(results)
+		emit_signal('results')
 		return
 	if label == "end":
 		emit_signal('end')
